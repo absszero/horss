@@ -8,7 +8,7 @@ module.exports = {
     ecmaVersion: 13,
     sourceType: 'module'
   },
-  plugins: [],
+  plugins: ['vitest'],
   rules: {},
   overrides: [
     {
