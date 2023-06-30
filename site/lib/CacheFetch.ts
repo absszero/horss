@@ -6,7 +6,7 @@ import { pino } from 'pino';
 export default async (link: string, doCache : boolean = true) => {
     const { serverRuntimeConfig } = getConfig()
     const cache = Cache({
-        basePath: resolve('./pages', '../' + serverRuntimeConfig.CACHE_DIR),
+        basePath: resolve('./pages', serverRuntimeConfig.CACHE_DIR),
         ttl: 172800, // 快取兩天
     });
     let logger = pino();
