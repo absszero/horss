@@ -6,12 +6,12 @@ export function setXmlHeader ( res: NextApiResponse )  {
     res.setHeader("Content-Type", "application/xml;charset=UTF-8");
 }
 
-export function parse ( xml: string )  {
-    return (new XMLParser).parse(xml);
+export function parse ( xml: string, options?: {} )  {
+    return (new XMLParser(options)).parse(xml);
 }
 
-export function build ( json: any )  {
-    return (new XMLBuilder()).build(json);
+export function build ( json: any, options?: {} )  {
+    return (new XMLBuilder(options)).build(json);
 }
 
 export function toSafeXml(html: string, selector: string) {
