@@ -6,16 +6,16 @@ import LZString from 'lz-string';
 export default async (link: string, doCache : boolean = true, onlyTag = "") => {
 
     let logger = pino();
-    let text = "";
+    let text: string | null = "";
     if (doCache) {
         logger.info(`get cache: ${link}`);
-        text = await kv.get(link) as string;
-        let decompressed = LZString.decompressFromUTF16(text);
-        if (decompressed) {
-            logger.info(decompressed);
-            return decompressed;
+        text = await kv.get(link);
+        if (text) {
+            let decompressed = LZString.decompressFromUTF16(text);
+            if (decompressed) {
+                return decompressed;
+            }
         }
-        return text;
     }
 
     logger.info(`fetch: ${link}`);
