@@ -8,8 +8,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   const json = Xml.parse(xml);
   for (const item of json.rss.channel.item) {
-    const html = await fetch(item.link);
-    item.description = Xml.toSafeXml(html, 'article')
+    item.description = await fetch(item.link, true, 'article');
   }
   const xmlContent = Xml.build(json);
   Xml.setXmlHeader(res);
