@@ -4,6 +4,7 @@ const nextConfig = {
         typedRoutes: true,
     },
     serverRuntimeConfig: {
+        redisUrl: process.env.REDIS_URL
     }
 }
 
