@@ -48,7 +48,7 @@ export default class Storage {
         if (doCache) {
             this.logger.info(`set cache: ${link}`);
             let buffer = LZString.compressToUTF16(text)
-            await this.redis.set(link, buffer);
+            await this.redis.set(link, buffer, 'EX', 60 * 60 * 48);
         }
 
         return text;
