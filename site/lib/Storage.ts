@@ -1,31 +1,35 @@
 import getConfig from 'next/config'
 import { pino } from 'pino';
 import { createClient } from 'redis';
+import type { RedisClientType } from 'redis';
 import Xml from '@/lib/Xml';
 import LZString from 'lz-string';
 
 export default class Storage {
-    private redis: any;
+    private redis: RedisClientType;
     private logger;
 
     constructor() {
         this.logger = pino();
+
+        const { serverRuntimeConfig } = getConfig()
+        this.redis = createClient({
+            url: serverRuntimeConfig.redisUrl
+        });
     }
 
     private async getRedis() {
-        const { serverRuntimeConfig } = getConfig()
-        const redis = await createClient({
-            url: serverRuntimeConfig.redisUrl
-        }).on('error', err => console.log('Redis Client Error', err))
-            .connect();
-        return redis;
+        if (this.redis.isReady) {
+            return this.redis;
+        } else {
+            this.redis.on('error', err => console.log('Redis Client Error', err))
+            await this.redis.connect();
+        }
+        return this.redis;
     }
 
     public async fetch(link: string, doCache: boolean = true, onlyTag = "") {
-        if (!this.redis) {
-            this.redis = await this.getRedis();
-        }
-
+        this.redis = await this.getRedis();
         let text: string | null = "";
         if (doCache) {
             this.logger.info(`get cache: ${link}`);
@@ -48,7 +52,7 @@ export default class Storage {
         if (doCache) {
             this.logger.info(`set cache: ${link}`);
             let buffer = LZString.compressToUTF16(text)
-            await this.redis.set(link, buffer, new Date().getTime() + 5 * 60 * 60 * 24);
+            await this.redis.setEx(link, 60 * 60 * 72, buffer);
         }
 
         return text;
