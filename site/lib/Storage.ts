@@ -3,7 +3,6 @@ import { pino } from 'pino';
 import { createClient } from 'redis';
 import type { RedisClientType } from 'redis';
 import Xml from '@/lib/Xml';
-import LZString from 'lz-string';
 
 export default class Storage {
     private redis: RedisClientType;
@@ -35,10 +34,7 @@ export default class Storage {
             this.logger.info(`get cache: ${link}`);
             text = await this.redis.get(link);
             if (text) {
-                let decompressed = LZString.decompressFromUTF16(text);
-                if (decompressed) {
-                    return decompressed;
-                }
+                return text;
             }
         }
 
@@ -51,8 +47,7 @@ export default class Storage {
 
         if (doCache) {
             this.logger.info(`set cache: ${link}`);
-            let buffer = LZString.compressToUTF16(text)
-            await this.redis.setEx(link, 60 * 60 * 72, buffer);
+            await this.redis.setEx(link, 60 * 60 * 72, text);
         }
 
         return text;

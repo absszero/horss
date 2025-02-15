@@ -15,9 +15,16 @@ export function build( json: any, options?: {} )  {
 }
 
 export function toSafeXml(html: string, selector: string) {
-    const root = htmlParse(html);
+    const root = htmlParse(html, {
+        blockTextElements: {
+            script: false, // keep text content when parsing
+            noscript: false, // keep text content when parsing
+            style: false, // keep text content when parsing
+            pre: true // keep text content when parsing
+        }
+    });
     const article = root.querySelector(selector);
-    return article?.toString().replace(/[\u0000-\u001F\u007F-\u009F]/g, "");
+    return article?.removeWhitespace().toString().replace(/[\u0000-\u001F\u007F-\u009F]/g, "");
 }
 
 export default { setXmlHeader, parse, build, toSafeXml }
